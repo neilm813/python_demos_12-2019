@@ -46,7 +46,7 @@
     2. select flask (if it doesn't show, might need to select python then flask will show)
     3. If prompted: press enter to confirm file name `app.py` or change the name if you used a different file name
     - `launch.json` will be created - ok to close it
-    - delete `launch.json` if you need to re-do step 13
+      - if you made a mistake you can delete `launch.json` to re-do this step
 
 # When reopening vscode
 - vscode needs to be opened to the `server` folder so it detects the virtual environment
