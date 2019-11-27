@@ -1,4 +1,3 @@
-# OPEN THIS IN VSCODE -> Right click tab -> Open Preview
 # Flask cheat sheet
 
 ## Replace `your_project_name` and `app_name` with your chosen project & app names
