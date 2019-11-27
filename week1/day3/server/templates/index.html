@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+
+  <div class="container">
+
+    <form action="/register" method="POST">
+      <h1 class="mb-5 mt-3">Give me your data!</h1>
+
+      <div class="form-group">
+        <label>Name: </label>
+        <input class="form-control" type="text" name="name">
+      </div>
+
+      <div class="form-group">
+        <label>Age: </label>
+        <input class="form-control" type="number" name="age">
+      </div>
+
+      <div class="form-group">
+        <label>Favorite Quote: </label>
+        <textarea class="form-control" name="favorite-quote" cols="30" rows="10">
+      </textarea>
+      </div>
+
+      <input class="btn btn-primary" type="submit" value="Submit Form">
+    </form>
+
+    <h2 class="mt-5 text-center">All Users</h2>
+    <table class="table">
+      <thead>
+        <th>
+          Name
+        </th>
+        <th>
+          Age
+        </th>
+      </thead>
+      <tbody>
+        {% for user in all_users %}
+        <tr>
+          <td>
+            <a href="/users/{{ loop.index - 1 }}">{{ user['name'] }}
+          </td>
+          <td>
+            {{ user['age'] }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</body>
+
+</html>
