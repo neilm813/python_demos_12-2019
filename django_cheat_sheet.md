@@ -1,4 +1,3 @@
-# OPEN THIS IN VSCODE -> Right click tab -> Open Preview
 # Django 2.2 Cheat Sheet
 
 ## *Replace `your_project_name` and `app_name` with your chosen project & app names*
@@ -93,6 +92,19 @@
     - activate it
     - `pip install -r requirements.txt` to install everything required
 
+# Django MTV (Model Template View)
+- the view retrieves data from the database via the model, formats it, bundles it up in an HTTP response object and sends it to the client (browser).
+- In other words, the view presents the model to the client as an HTTP response.
+
+# App flow walkthrough
+1. *Request* is made (URL visited, network tab in chrome dev tools will show the request)
+2. URL is compared to the URLs in project-level `urls.py`
+3. project-level `urls.py` routes to the appropriate app's `urls.py`
+4. app-level `urls.py` matches the requested URL to the listed URLS
+5. matched URL runs the specified method in the `views.py` file
+    - view method is passed the request as the first arg and any URL parameters as additional args
+6. view method redirects to another URL or renders an HTML page as a *response*
+
 # Model Examples
 - user can have many tasks, but a task can be added by only 1 user
 - many to many between user and tasks for liking: user can like many tasks, task can be liked by many users
@@ -118,15 +130,6 @@
           "User", related_name="assigned_tasks", on_delete=models.CASCADE)
       liked_by = models.ManyToManyField("User", related_name="liked_tasks")
   ```
-
-# App flow walkthrough
-1. *Request* is made (URL visited, network tab in chrome dev tools will show the request)
-2. URL is compared to the URLs in project-level `urls.py`
-3. project-level `urls.py` routes to the appropriate app's `urls.py`
-4. app-level `urls.py` matches the requested URL to the listed URLS
-5. matched URL runs the specified method in the `views.py` file
-    - view method is passed the request as the first arg and any URL parameters as additional args
-6. view method redirects to another URL or renders an HTML page as a *response*
 
 # Troubleshooting
 ## `pip` not recognized (windows)
