@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="text-center mt-3 mb-5">All Uploaded Shirts</h1>
+
+    {% for current_shirt in all_shirts %}
+    <div class="card shadow w-50 mx-auto mb-5">
+      <div class="card-header">
+        <h3 class="text-center">
+          <a href="/users/{{ current_shirt.uploaded_by.id }}">
+            by: {{ current_shirt.uploaded_by.full_name }}
+          </a>
+        </h3>
+      </div>
+      <div class="card-body text-center">
+        <p class="h6">{{ current_shirt.phrase }}</p>
+        <hr>
+        <p>
+          <span class="text-danger font-weight-bold">$</span>
+          {{ current_shirt.price }}
+        </p>
+      </div>
+      <div class="card-footer text-muted text-center">
+        <a href="/shirts/{{ current_shirt.id }}/like"
+          class="{% if logged_in_user in current_shirt.users_who_liked.all %} text-danger {% else %} text-dark {% endif %}">
+          &hearts;
+        </a>
+        <div>
+          {% for user_who_liked in current_shirt.users_who_liked.all %}
+          <span>
+            {{ user_who_liked.full_name }}{% if not forloop.last %}, {% endif %}
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+
+</body>
+
+</html>
