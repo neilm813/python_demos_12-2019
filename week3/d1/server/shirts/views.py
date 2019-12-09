@@ -17,50 +17,17 @@ def index(request):
 def login(request):
     # when added to session, user is considered 'logged in'
 
-    # .filter ALWAYS returns a query set LIST 0 or more items
-    # (need to index list)
-    found_users = User.objects.filter(email=request.POST['email'])
+    logged_in_user = User.objects.login(request)
 
-    if len(found_users) > 0:
-        user_from_db = found_users[0]
-
-        is_pw_correct = bcrypt.checkpw(
-            request.POST['password'].encode(), user_from_db.password.encode())
-
-        if is_pw_correct:
-            request.session['uid'] = user_from_db.id
-            return redirect('/home')
-        else:
-            print('password incorrect')
+    if logged_in_user is not None:
+        return redirect('/home')
     else:
-        print('no user found')
-
-    messages.error(request, 'Invalid credentials')
-    return redirect('/')
+        return redirect('/')
 
 
 def register(request):
 
-    if len(request.POST['first_name']) < 2:
-        messages.error(request, 'First name must be at least 2 characters.')
-
-    if len(request.POST['last_name']) < 2:
-        messages.error(request, 'Last name must be at least 2 characters.')
-
-    if len(request.POST['email']) < 3:
-        messages.error(request, 'Email must be at least 3 characters.')
-
-    if len(request.POST['password']) < 8:
-        messages.error(request, 'Password must be at least 8 characters.')
-
-    if request.POST['password'] != request.POST['password_confirm']:
-        messages.error(request, 'Passwords must match.')
-
-    error_messages = messages.get_messages(request)
-    # don't clear messages due to them being accessed
-    error_messages.used = False
-
-    if len(error_messages) > 0:
+    if User.objects.is_reg_valid(request) is False:
         return redirect('/')
 
     hashed_pw = bcrypt.hashpw(

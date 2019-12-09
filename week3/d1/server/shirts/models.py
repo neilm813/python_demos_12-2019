@@ -1,4 +1,57 @@
 from django.db import models
+from django.contrib import messages
+from django.contrib.messages import get_messages
+import bcrypt
+
+
+class UserManager(models.Manager):
+    def is_reg_valid(self, request):
+
+        if len(request.POST['first_name']) < 2:
+            messages.error(
+                request, 'First name must be at least 2 characters.')
+
+        if len(request.POST['last_name']) < 2:
+            messages.error(request, 'Last name must be at least 2 characters.')
+
+        if len(request.POST['email']) < 3:
+            messages.error(request, 'Email must be at least 3 characters.')
+
+        if len(request.POST['password']) < 8:
+            messages.error(request, 'Password must be at least 8 characters.')
+
+        if request.POST['password'] != request.POST['password_confirm']:
+            messages.error(request, 'Passwords must match.')
+
+        error_messages = messages.get_messages(request)
+        # don't clear messages due to them being accessed
+        error_messages.used = False
+        return len(error_messages) == 0
+
+    def login(self, request):
+        # .filter ALWAYS returns a query set LIST 0 or more items
+        # (need to index list)
+
+        logged_in_user = None
+        found_users = User.objects.filter(email=request.POST['email'])
+
+        if len(found_users) > 0:
+            user_from_db = found_users[0]
+
+            is_pw_correct = bcrypt.checkpw(
+                request.POST['password'].encode(),
+                user_from_db.password.encode())
+
+            if is_pw_correct:
+                request.session['uid'] = user_from_db.id
+                logged_in_user = user_from_db
+            else:
+                print('password incorrect')
+        else:
+            print('no user found')
+
+        messages.error(request, 'Invalid credentials')
+        return logged_in_user
 
 
 class User(models.Model):
@@ -8,6 +61,7 @@ class User(models.Model):
     password = models.CharField(max_length=60)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    objects = UserManager()
 
     def full_name(self):
         return self.first_name + ' ' + self.last_name
