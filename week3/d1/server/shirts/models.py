@@ -32,7 +32,6 @@ class UserManager(models.Manager):
         # .filter ALWAYS returns a query set LIST 0 or more items
         # (need to index list)
 
-        logged_in_user = None
         found_users = User.objects.filter(email=request.POST['email'])
 
         if len(found_users) > 0:
@@ -44,14 +43,14 @@ class UserManager(models.Manager):
 
             if is_pw_correct:
                 request.session['uid'] = user_from_db.id
-                logged_in_user = user_from_db
+                return user_from_db
             else:
                 print('password incorrect')
         else:
             print('no user found')
 
         messages.error(request, 'Invalid credentials')
-        return logged_in_user
+        return None
 
 
 class User(models.Model):
