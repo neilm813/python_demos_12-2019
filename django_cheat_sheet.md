@@ -1,26 +1,27 @@
 # Django 2.2 Cheat Sheet
 
-## *Replace `your_project_name` and `app_name` with your chosen project & app names*
+# *Replace `your_project_name` and `app_name` with your chosen project & app names*
 
 1. open terminal to where you want your project folder to be created
 2. `mkdir your_project_name`
 3. `cd your_project_name`
 4. `mkdir server`
 5. `cd server`
-6. windows: `python -m venv env` mac: `python3 -m venv env`
+6. **windows**: `python -m venv env` **mac**: `python3 -m venv env`
     - new line in terminal will appear after finished
-7. open vscode to `server` folder. From terminal: `code .`
-    - mac: if `code .` doesn't work
+7. open vscode to `server` folder. From terminal, type: `code .`
+    - mac - if `code .` doesn't work, open vscode:
       1. cmd + shift + p
-      2. shell command: install 'code' command in PATH
+      2. type: shell command: install 'code' command in PATH
       3. restart terminal
+      4. open terminal to `server` folder then type `code .` again
 8. Ctrl+shift+P -> 'select interpreter' -> choose the one from the env
     - if it doesn't show up, your env is still being created, wait then select interpreter again
 9. Open new integrated terminal, should show `(env)` in the terminal
     - if integrated terminal doesn't show `(env)`, press the **`+`** button to open new integrated terminal
 10. Install dependencies from your integrated terminal that shows `(env)` so these will be installed only for this project
     - `pip install Django==VERSION_NUMBER`
-    - [Check Ver. Num On Learn Platform](http://learn.codingdojo.com/m/119/6366/45215)
+    - [Check Ver. Num On Learn Platform](http://learn.codingdojo.com/m/119/6152/42896)
 11. From `server` folder `django-admin startproject your_proj_name .`
     - ` .` will make it so there's only one folder with the your_proj_name instead of also having an inner folder with the same name
 12. Click debug icon in vscode side bar (bug icon Ctrl+shift+D)
@@ -46,6 +47,7 @@
       from django.urls import path
       from . import views
 
+      # NO LEADING SLASHES
       urlpatterns = [
           path('', views.index, name='index'),
       ]
@@ -69,13 +71,39 @@
 
 # Debugging Notes
 ## To Debug with breakpoints (won't auto reload on code changes)
-- Stop server `ctrl + c` Use play button in debug panel or press F5
+- **Stop server** `ctrl + c` then press play button in debug panel or press F5
   - add a breakpoint by clicking to the LEFT of the line number so that a red circle appears
+
+# Route Parameters / URL clarifications
+## `urls.py` - NO LEADING SLASHES
+- `path('users/<int:user_id>', views.user_profile, name="users_profile"),`
+- this is to MATCH a *requested* URL in order for django to know which view function to route to when a URL is requested so that the proper *response* can be given to the client
+- `<int:id>` is a PLACEHOLDER for whatever integer will be located at that section of the URL
+  - it is a route parameter, just like a function parameter, it will store the value that is passed in when the url is visited just like a function parameter will store the value that is passed in when the function is executed
+  - e.g., `http://localhost:8000/users/15` - `15` is the value of route parameter `user_id`
+- when this url is visited, the `user_profile` function in `views.py` will be executed and it MUST have a corresponding parameter with the same name as the route parameter: `def user_profile(request, user_id)`
+
+## When are values inserted into urls?
+- when a client types in a url
+
+### HTML files
+- in `html` files you generally have **leading slashes on your urls**
+- in `<a>` tags
+- in `action` attribute of a `<form>` tag
+- the above are all places where you will use jinja to insert the actual value that you want `user_id` to have
+- `<a href="/users/{{ user.id }}">`
+- `<form action="/users/{{ user.id }}/update" method="POST">`
+
+### `views.py`
+- you generally have **leading slashes on your urls** here
+- when you `return redirect(f'/users/{some_id}')`
+
 
 # Terminal Commands
 ## `python manage.py runserver`
 - stop debug mode if it is on
 - this command will auto reloading server on code changes which is useful for when you are making many changes
+
 ## Migrating
 1. `python manage.py makemigrations`
 2. `python manage.py migrate`
@@ -142,6 +170,7 @@
 
 ## Invalid Salt
 - add `decode` to end `hashed_pw = bcrypt.hashpw('test'.encode(), bcrypt.gensalt()).decode()`
+- is pw in db plaintext?
 
 ## Migration Issues
 ### Reset DB
@@ -170,6 +199,38 @@
 ### Erroneous Unresolved Import
 - ctrl + shift + p > Open Settings (JSON)
 - comment out `{"python.jediEnabled": false}` in `settings.json`
+
+# Deployment
+-[console.aws](https://us-west-1.console.aws.amazon.com/console/home?region=us-west-1#)
+- create an account then go back to this url after logging in or navigate to the AWS Management Console manually after logging in
+
+## USE GIT BASH IF ON WINDOWS, NOT COMMAND PROMPT
+1. Launch a virtual machine With EC2
+2. select Ubuntu Server 18.04 LTS (HVM)
+3. select free tier option
+4. click Review and Launch
+5. click Edit security groups
+6. Under Source: select My IP
+7. click Add Rule
+    - Type: HTTP
+    - Source: Anywhere
+8. click Add Rule
+    - Type: HTTP
+    - Source: Anywhere
+9. click Review and Launch
+10. click Launch
+11. Select an existin gkey pair or create a new key pair
+    - steps to create a new key pair if you don't have one
+    1. select Create a new key pair
+    2. Key pair name: django_pem
+    3. click Download Key Pair
+        - save it to a folder you will **NEVER** use as a github repo
+    4. click Launch Instances
+12. click View Instances
+13. update Name column: django
+14. http://learn.codingdojo.com/m/119/6138/42635
+- https://us-west-1.console.aws.amazon.com/ec2/v2/home?region=us-west-1#Instances:sort=desc:publicIp
+
 
 # Optional Design Patterns
 - only try these if you are not struggling
