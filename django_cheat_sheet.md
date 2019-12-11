@@ -216,6 +216,7 @@
     .vscode/
     db.sqlite3
     ```
+- create a repo on github, then follow the steps on github for pushing code to the repo
 
 ## USE GIT BASH IF ON WINDOWS, NOT COMMAND PROMPT
 1. Launch a virtual machine With EC2
