@@ -203,9 +203,19 @@
 - ctrl + shift + p > Open Settings (JSON)
 - comment out `{"python.jediEnabled": false}` in `settings.json`
 
-# Deployment
--[console.aws](https://us-west-1.console.aws.amazon.com/console/home?region=us-west-1#)
+# Deployment (WORK IN PROGRESS)
+- [console.aws](https://us-west-1.console.aws.amazon.com/console/home?region=us-west-1#)
 - create an account then go back to this url after logging in or navigate to the AWS Management Console manually after logging in
+
+## create a file named `.gitignore` at same level as `manage.py`
+- add this code to it
+  - ``` txt
+    env/
+    venv/
+    __pycache__/
+    .vscode/
+    db.sqlite3
+    ```
 
 ## USE GIT BASH IF ON WINDOWS, NOT COMMAND PROMPT
 1. Launch a virtual machine With EC2
