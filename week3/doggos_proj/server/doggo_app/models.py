@@ -49,3 +49,23 @@ class User(models.Model):
         s += f"last_name: {self.last_name}\n"
         s += f"email: {self.email}\n"
         return s
+
+
+class Doggo(models.Model):
+    name = models.CharField(max_length=60)
+    profile_pic_url = models.TextField()
+    bio = models.TextField()
+    age = models.IntegerField()
+    weight = models.IntegerField()
+    tricks = models.TextField()
+    is_good_boy = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    # Relationships
+    submitted_by = models.ForeignKey(
+        User, on_delete='CASCADE', related_name='dogs')
+
+    def __str__(self):
+        s = '\n'
+        s += f"name: {self.name}\n"
+        return s

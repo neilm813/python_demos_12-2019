@@ -70,7 +70,8 @@ def home(request):
         return redirect('/')
     else:
         context = {
-            'logged_in_user': User.objects.get(id=uid)
+            'logged_in_user': User.objects.get(id=uid),
+            'all_doggos': Doggo.objects.all()
         }
         return render(request, 'home.html', context)
 
@@ -78,3 +79,50 @@ def home(request):
 def logout(request):
     request.session.clear()
     return redirect('/')
+
+
+# Doggos
+def doggo_new(request):
+
+    if request.session.get('uid') is None:
+        return redirect('/')
+    else:
+        return render(request, 'doggos/new.html')
+
+
+def doggo_create(request):
+
+    uid = request.session.get('uid')
+
+    if uid is None:
+        return redirect('/')
+
+    logged_in_user = User.objects.get(id=uid)
+
+    new_doggo = Doggo.objects.create(
+        name=request.POST['name'],
+        age=request.POST['age'],
+        weight=request.POST['weight'],
+        tricks=request.POST['tricks'],
+        bio=request.POST['bio'],
+        profile_pic_url=request.POST['profile_pic_url'],
+        submitted_by=logged_in_user)
+
+    return redirect(f'/doggos/{new_doggo.id}')
+
+
+def doggo_profile(request, doggo_id):
+
+    if request.session.get('uid') is None:
+        return redirect('/')
+    else:
+        found_doggos = Doggo.objects.filter(id=doggo_id)
+
+        if len(found_doggos) == 0:
+            # no doggo found, bad id
+            return redirect('/home')
+        else:
+            context = {
+                'doggo': found_doggos[0]
+            }
+            return render(request, 'doggos/profile.html', context)
