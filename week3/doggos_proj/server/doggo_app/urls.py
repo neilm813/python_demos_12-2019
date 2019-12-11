@@ -13,5 +13,6 @@ urlpatterns = [
     path('doggos/new', views.doggo_new, name='doggo_new'),
     path('doggos/create', views.doggo_create, name='doggo_create'),
     path('doggos/<int:doggo_id>', views.doggo_profile, name='doggo_profile'),
-
+    path('doggos', views.doggos, name='doggos'),
+    path('doggos/<int:doggo_id>/good_boy', views.good_boy, name='good_boy'),
 ]

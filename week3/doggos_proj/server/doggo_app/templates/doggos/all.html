@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+
+  <div class="container pt-5">
+    <h3>
+      <a href="/home">Home</a>
+    </h3>
+    <div class="row">
+
+      <div class="col-md">
+        <h1 class="mb-3">Good Boys</h1>
+
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Weight</th>
+              <th>Birthday</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for good_boy in good_boys %}
+            <tr>
+              <td>{{ good_boy.name }}</td>
+              <td>{{ good_boy.age }}</td>
+              <td>{{ good_boy.weight }}</td>
+              <td>{{ good_boy.birthday }}</td>
+              <td>
+                Actions
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="col-md">
+        <h1 class="mb-3">Bad Boys</h1>
+
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Weight</th>
+              <th>Birthday</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for bad_boy in bad_boys %}
+            <tr>
+              <td>{{ bad_boy.name }}</td>
+              <td>{{ bad_boy.age }}</td>
+              <td>{{ bad_boy.weight }}</td>
+              <td>{{ bad_boy.birthday }}</td>
+              <td>
+                <a href="/doggos/{{ bad_boy.id }}/good_boy">
+                  Who's a good boy!?
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+
+</html>

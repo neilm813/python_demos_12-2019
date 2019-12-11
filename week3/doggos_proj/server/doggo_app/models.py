@@ -59,6 +59,7 @@ class Doggo(models.Model):
     weight = models.IntegerField()
     tricks = models.TextField()
     is_good_boy = models.BooleanField(default=False)
+    birthday = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # Relationships

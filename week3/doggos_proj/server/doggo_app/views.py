@@ -106,7 +106,9 @@ def doggo_create(request):
         tricks=request.POST['tricks'],
         bio=request.POST['bio'],
         profile_pic_url=request.POST['profile_pic_url'],
-        submitted_by=logged_in_user)
+        submitted_by=logged_in_user,
+        birthday=request.POST['birthday']
+    )
 
     return redirect(f'/doggos/{new_doggo.id}')
 
@@ -126,3 +128,34 @@ def doggo_profile(request, doggo_id):
                 'doggo': found_doggos[0]
             }
             return render(request, 'doggos/profile.html', context)
+
+
+def doggos(request):
+
+    if request.session.get('uid') is None:
+        return redirect('/')
+
+    else:
+        context = {
+            'good_boys': Doggo.objects.filter(is_good_boy=True),
+            'bad_boys': Doggo.objects.filter(is_good_boy=False),
+        }
+
+        return render(request, 'doggos/all.html', context)
+
+
+def good_boy(request, doggo_id):
+
+    if request.session.get('uid') is None:
+        return redirect('/')
+
+    found_doggos = Doggo.objects.filter(id=doggo_id)
+
+    if len(found_doggos) != 0:
+        # since doggos list is not empty, there should be 1 doggo
+        # extract the single doggo from the list
+        doggo = found_doggos[0]
+        doggo.is_good_boy = True
+        doggo.save()
+
+    return redirect('/doggos')
