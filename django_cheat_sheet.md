@@ -177,6 +177,9 @@
 1. `pip install django-extensions`
 2. add `django_extensions` to `INSTALLED_APPS`
 3. `python manage.py reset_db`
+4. `python manage.py makemigrations`
+5. `python manage.py migrate`
+6. comment out `django_extensions` in `INSTALLED_APPS` to avoid 'module not found error' when debug mode
 
 ### New Column Issue / Default Value
 - can add a bogus default value just to get passed the error, then delete the existing rows from that table to start fresh, or the below
