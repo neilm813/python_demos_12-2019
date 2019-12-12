@@ -126,12 +126,10 @@
 
 # App flow walkthrough
 1. *Request* is made (URL visited, network tab in chrome dev tools will show the request)
-2. URL is compared to the URLs in project-level `urls.py`
-3. project-level `urls.py` routes to the appropriate app's `urls.py`
-4. app-level `urls.py` matches the requested URL to the listed URLS
-5. matched URL runs the specified method in the `views.py` file
-    - view method is passed the request as the first arg and any URL parameters as additional args
-6. view method redirects to another URL or renders an HTML page as a *response*
+2. URL is compared to the `urls.py` file to see if it matches any of the urls in the list of urls
+3. When URL is matched, it runs the specified view function, passing any URL parameters to the view function. The view function needs a parameter for each of the URL parameters using the same parameter names.
+4. view function gets data from the database if needed and sends that data to the right template (HTML) to display the data, ***OR*** the view function redirects to another URL (see step 2)
+5. Whatever the view function returns is the *response* which finishes the *request* *response* cycle.
 
 # Model Examples
 - user can have many tasks, but a task can be added by only 1 user
