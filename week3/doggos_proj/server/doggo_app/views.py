@@ -87,7 +87,12 @@ def doggo_new(request):
     if request.session.get('uid') is None:
         return redirect('/')
     else:
-        return render(request, 'doggos/new.html')
+
+        context = {
+            'tricks': Trick.objects.all(),
+        }
+
+        return render(request, 'doggos/new.html', context)
 
 
 def doggo_create(request):
@@ -97,18 +102,45 @@ def doggo_create(request):
     if uid is None:
         return redirect('/')
 
+    if Doggo.objects.is_form_valid(request) is False:
+        return redirect('/doggos/new')
+
     logged_in_user = User.objects.get(id=uid)
 
     new_doggo = Doggo.objects.create(
         name=request.POST['name'],
         age=request.POST['age'],
         weight=request.POST['weight'],
-        tricks=request.POST['tricks'],
         bio=request.POST['bio'],
         profile_pic_url=request.POST['profile_pic_url'],
         submitted_by=logged_in_user,
         birthday=request.POST['birthday']
     )
+
+    # Value None and value empty string will not pass an if conditon
+    form_tricks = [
+        # None or the value of input if checked
+        request.POST.get('trick_roll_over'),
+        request.POST.get('trick_sit'),
+        request.POST.get('trick_shake'),
+
+        # empty string or the value
+        request.POST.get('trick_other'),
+    ]
+
+    for trick in form_tricks:
+        # trick isn't None and isn't empty string
+        if trick:
+            found_tricks = Trick.objects.filter(name=trick)
+
+            if len(found_tricks) > 0:
+                trick_from_db = found_tricks[0]
+                new_doggo.tricks.add(trick_from_db)
+
+            # trick not in db, create it
+            else:
+                new_trick = Trick.objects.create(name=trick)
+                new_doggo.tricks.add(new_trick)
 
     return redirect(f'/doggos/{new_doggo.id}')
 
@@ -144,7 +176,7 @@ def doggos(request):
         return render(request, 'doggos/all.html', context)
 
 
-def toggle_good_boy(request, doggo_id):
+def doggo_toggle_good_boy(request, doggo_id):
 
     if request.session.get('uid') is None:
         return redirect('/')
@@ -203,13 +235,24 @@ def doggo_edit(request, doggo_id):
 
 def doggo_update(request, doggo_id):
 
-    if request.session.get('uid') is None:
+    uid = request.session.get('uid')
+
+    if uid is None:
         return redirect('/')
+
+    if Doggo.objects.is_form_valid(request) is False:
+        return redirect(f'/doggos/{doggo_id}/edit')
 
     found_doggos = Doggo.objects.filter(id=doggo_id)
 
     if len(found_doggos) > 0:
+
+        logged_in_user = User.objects.get(id=uid)
         doggo_to_update = found_doggos[0]
+
+        if logged_in_user != doggo_to_update.submitted_by:
+            # return to prevent updating
+            return redirect('/doggos')
 
         doggo_to_update.name = request.POST['name']
         doggo_to_update.profile_pic_url = request.POST['profile_pic_url']
@@ -220,6 +263,6 @@ def doggo_update(request, doggo_id):
         doggo_to_update.birthday = request.POST['birthday']
         doggo_to_update.save()
         return redirect(f'/doggos/{doggo_id}')
-
+    # no dog found
     else:
         return redirect('/home')

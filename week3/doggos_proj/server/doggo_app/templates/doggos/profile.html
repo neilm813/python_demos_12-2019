@@ -22,8 +22,11 @@
       <div class="col-md">
         <img class="border border-info rounded-circle w-75" src="{{ doggo.profile_pic_url }}" alt="Profile Picture">
       </div>
-      <div class="col-md shadow rounded-lg pt-3">
-        <p>{{ doggo.bio }}</p>
+      <div class="col-md">
+        <div class="shadow rounded-lg p-3">
+          <h2 class="text-center">Bio</h2>
+          <p>{{ doggo.bio }}</p>
+        </div>
       </div>
     </div>
 
@@ -33,7 +36,15 @@
       <p>Age: {{ doggo.age }}</p>
       <p>Weight: {{ doggo.weight }}</p>
       <p>Birthday: {{ doggo.birthday }}</p>
-      <p>Tricks: {{ doggo.tricks }}</p>
+
+      <h3>Tricks:</h3>
+      <ul>
+        {% for trick in doggo.tricks.all %}
+        <li>
+          {{ trick.name }}
+        </li>
+        {% endfor %}
+      </ul>
     </div>
 
   </div>

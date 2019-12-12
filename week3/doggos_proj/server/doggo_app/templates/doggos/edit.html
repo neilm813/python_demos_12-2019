@@ -14,6 +14,18 @@
 
   <div class="container pt-3">
 
+    <section class="text-danger text-center">
+      {% if messages %}
+      <ul class="list-unstyled d-inline-block">
+        {% for message in messages %}
+        <li class="text-left">
+          {{ message }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </section>
+
     <div class="card shadow">
       <div class="card-header">
         <h3 class="text-center">
@@ -41,20 +53,17 @@
 
           <div class="form-group">
             <label>Tricks</label>
-            <textarea class="form-control" name="tricks">{{ doggo_to_edit.tricks }}
-            </textarea>
+            <textarea class="form-control" name="tricks">{{ doggo_to_edit.tricks }}</textarea>
           </div>
 
           <div class="form-group">
             <label>Bio</label>
-            <textarea class="form-control" name="bio">{{ doggo_to_edit.bio }}
-            </textarea>
+            <textarea id="bio" class="form-control" name="bio">{{ doggo_to_edit.bio }}</textarea>
           </div>
 
           <div class="form-group">
             <label>Profile Pic URL</label>
-            <textarea class="form-control" name="profile_pic_url">{{ doggo_to_edit.profile_pic_url }}
-            </textarea>
+            <textarea class="form-control" name="profile_pic_url">{{ doggo_to_edit.profile_pic_url }}</textarea>
           </div>
 
           <div class="form-group">

@@ -51,22 +51,45 @@ class User(models.Model):
         return s
 
 
+class DoggoManager(models.Manager):
+    def is_form_valid(self, request):
+
+        if len(request.POST['profile_pic_url']) < 1:
+            messages.error(request, 'Profile picture is required.')
+
+        if len(request.POST['bio']) < 10:
+            messages.error(request, 'Bio must be at least 10 characters.')
+
+        if len(request.POST['name']) < 2:
+            messages.error(request, 'Name must be at least 2 characters.')
+
+        error_messages = messages.get_messages(request)
+        # don't clear messages due to them being accessed
+        error_messages.used = False
+        return len(error_messages) == 0
+
+
 class Doggo(models.Model):
     name = models.CharField(max_length=60)
     profile_pic_url = models.TextField()
     bio = models.TextField()
     age = models.IntegerField()
     weight = models.IntegerField()
-    tricks = models.TextField()
     is_good_boy = models.BooleanField(default=False)
     birthday = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    objects = DoggoManager()
     # Relationships
     submitted_by = models.ForeignKey(
-        User, on_delete='CASCADE', related_name='dogs')
+        'User', on_delete='CASCADE', related_name='dogs')
+    tricks = models.ManyToManyField('Trick', related_name='dogs_with_trick')
 
     def __str__(self):
         s = '\n'
         s += f"name: {self.name}\n"
         return s
+
+
+class Trick(models.Model):
+    name = models.CharField(max_length=60)

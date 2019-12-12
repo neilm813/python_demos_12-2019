@@ -43,9 +43,9 @@
                 <br>
                 <a href="/doggos/{{ good_boy.id }}">Profile</a>
                 <br>
+                {% if good_boy.submitted_by.id == request.session.uid %}
                 <a href="/doggos/{{ good_boy.id }}/edit">Edit</a>
                 <br>
-                {% if good_boy.submitted_by.id == request.session.uid %}
                 <a href="/doggos/{{ good_boy.id }}/delete">Delete</a>
                 {% endif %}
               </td>
@@ -84,6 +84,8 @@
                 <a href="/doggos/{{ bad_boy.id }}">Profile</a>
                 <br>
                 {% if bad_boy.submitted_by.id == request.session.uid %}
+                <a href="/doggos/{{ good_boy.id }}/edit">Edit</a>
+                <br>
                 <a href="/doggos/{{ bad_boy.id }}/delete">Delete</a>
                 {% endif %}
               </td>
