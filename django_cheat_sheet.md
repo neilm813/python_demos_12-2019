@@ -159,7 +159,26 @@
       liked_by = models.ManyToManyField("User", related_name="liked_tasks")
   ```
 
+# Prefill date from db into input box
+- ``` py
+  def edit_show(request, show_id):
+      selected_show = Show.objects.get(id=show_id)
+      context = {
+          'selected_show': selected_show,
+          'formatted_release_date': selected_show.release_date.strftime("%Y-%m-%d")
+      }
+  ```
+- `<input value="{{ formatted_release_date }}" type="date" name="release_date">`
+
 # Troubleshooting
+
+## MultiValueDictKeyError
+- the key doesn't exist in the dictionary
+  - check the spelling
+  - verify you are using the right key from the `<form>` that is being submitted, the key should relate to the `name` attribute on the `<input>` tags
+  - verify the `<form>` has a `method="POST"`
+    - if this is missing the request was sent as a GET request, which means `request.POST` is empty so the key's that correspond to the `<form>` `<input>` `name` attributes are missing
+
 ## `pip` not recognized (windows)
 - add it to path
 - use current python path to see where python is installed
@@ -173,7 +192,8 @@
 - is pw in db plaintext?
 
 ## Migration Issues
-### Reset DB
+### Clear All DB Data
+- doesn't delete migrations, so if there is an error in your migration files this won't fix it, see other options if this doesn't work
 1. `pip install django-extensions`
 2. add `django_extensions` to `INSTALLED_APPS`
 3. `python manage.py reset_db`
@@ -191,6 +211,14 @@
 5. add field back
 6. makemigrations & migrate
 
+### Complete destroy and restart db
+- delete everythign in `migrations` folder ***EXCEPT*** `__init__.py`
+- delete `db.sqlite3` file
+- empty trashcan
+- `python manage.py makemigrations`
+- `python manage.py migrate`
+
+
 ## `RuntimeError: __class__ not set defining 'AbstractBaseUser' django`
 - downgrade python to 3.7.x (to be compatible with django 1.10) or upgrade django
 
@@ -203,47 +231,145 @@
 - ctrl + shift + p > Open Settings (JSON)
 - comment out `{"python.jediEnabled": false}` in `settings.json`
 
-# Deployment (WORK IN PROGRESS)
-- [console.aws](https://us-west-1.console.aws.amazon.com/console/home?region=us-west-1#)
-- create an account then go back to this url after logging in or navigate to the AWS Management Console manually after logging in
+# Deployment Steps
+- create an account then go to [AWS Management Console](https://us-west-1.console.aws.amazon.com/console/home?region=us-west-1)
+- [running instances link](https://us-west-1.console.aws.amazon.com/ec2/v2/home?region=us-west-1#Instances:sort=instanceId)
 
 ## create a file named `.gitignore` at same level as `manage.py`
 - add this code to it
   - ``` txt
+    .vscode
     env/
     venv/
     __pycache__/
     .vscode/
     db.sqlite3
     ```
-- create a repo on github, then follow the steps on github for pushing code to the repo
 
-## USE GIT BASH IF ON WINDOWS, NOT COMMAND PROMPT
-1. Launch a virtual machine With EC2
+## `requirements.txt`
+- from the `server` folder with `env` activated: `pip freeze > requirements.txt`
+
+## Create github repo
+1. Open terminal to `server` folder
+2. `git init`
+3. `git add .`
+4. `git commit -m "first commit"`
+- create a repo on github
+  1. paste the `git remote add` line to terminal
+  2. paste the `git push` line to terminal
+
+## AWS EC2 Virtual Machine setup (*REPLACE {{}} WITH APPROPRIATE NAMES*)
+1. Click Launch a virtual machine With EC2
 2. select Ubuntu Server 18.04 LTS (HVM)
 3. select free tier option
 4. click Review and Launch
 5. click Edit security groups
-6. Under Source: select My IP
+6. Under Source on SSH: select My IP
 7. click Add Rule
     - Type: HTTP
     - Source: Anywhere
 8. click Add Rule
-    - Type: HTTP
+    - Type: HTTPS
     - Source: Anywhere
 9. click Review and Launch
 10. click Launch
-11. Select an existin gkey pair or create a new key pair
+11. Select an existing key pair or create a new key pair
     - steps to create a new key pair if you don't have one
-    1. select Create a new key pair
-    2. Key pair name: django_pem
-    3. click Download Key Pair
-        - save it to a folder you will **NEVER** use as a github repo
-    4. click Launch Instances
+      1. select Create a new key pair
+      2. Key pair name: django_pem
+      3. click Download Key Pair
+          - save it to a folder you will **NEVER** use as a github repo
+      4. click Launch Instances
 12. click View Instances
-13. update Name column: django
-14. http://learn.codingdojo.com/m/119/6138/42635
-- https://us-west-1.console.aws.amazon.com/ec2/v2/home?region=us-west-1#Instances:sort=desc:publicIp
+13. update Name column to: django
+14. open terminal to where your downloaded pem file is located (**windows users USE BASH instead of command prompt**)
+15. click connect at top of the AWS console
+16. copy and paste the `chmod` line of code into your terminal that is opened to the location of your downloaded pem file
+17. copy and paste the `ssh` line of code into your terminal
+    - if connection time out error:
+      1. description tab below click: Security groups launch-wizard-2
+      2. Inbound tab
+      3. click edit
+      4. add SSH with source My IP (any time your ip address changes you need to do this, your ip address will be different from home vs at the dojo)
+18. 'yes' to continue if prompted
+19. `sudo apt-get update`
+20. `sudo apt-get install nginx`
+21. `git clone {{YOUR_REPO_URL}}` - click the Clone or download button on your repo to get the URL
+22. `sudo apt-get install python3-venv`
+23. `cd {{YOUR_REPO_NAME}}`
+24. `python3 -m venv env`
+    - new line will appear in terminal after it's finished
+25. `source env/bin/activate` - should see `(env)` now in terminal
+26. `pip install -r requirements.txt`
+27. `pip install gunicorn`
+- [VIM info](http://learn.codingdojo.com/m/119/6138/42637)
+29. `cd {{YOUR_PROJECT_FOLDER_NAME}}` so that `ls` will show `settings.py`
+28. `sudo vim settings.py`
+29. press `i` to enter insert mode and use arrow keys to naviate to the correct place to type
+    - update the following lines:
+    1. `DEBUG = False`
+    2. `ALLOWED_HOSTS = ['{{YOUR_EC2_PUBLIC_IP_ADDRESS_FROM_AWS_DESCRIPTION_TAB}}']`
+    3. `STATIC_ROOT = os.path.join(BASE_DIR, "static/")	# add this line at the bottom; don't replace any existing lines!`
+    4. save and quit: press `esc`, type: `:wq`, press `enter`
+30. `cd ..` so `ls` shows `manage.py`
+31. `python manage.py collectstatic`
+32. `python manage.py makemigrations`
+33. `python manage.py migrate`
+34. test gunicorn to see if it works: `gunicorn {{DJANGO_PROJECT_NAME.wsgi}}`
+    - press `ctrl + c` to exit
+35. type `deactivate`
+36. `sudo vim /etc/systemd/system/gunicorn.service`
+    1. copy below text into vscode and ***REPLACE ALL THE {{}} TEXT WITH RIGHT NAMES***
+        - ``` txt
+          [Unit]
+          Description=gunicorn daemon
+          After=network.target
+          [Service]
+          User=ubuntu
+          Group=www-data
+          WorkingDirectory=/home/ubuntu/{{YOUR_REPO_NAME}}
+          ExecStart=/home/ubuntu/{{YOUR_REPO_NAME}}/env/bin/gunicorn --workers 3 --bind unix:/home/ubuntu/{{YOUR_REPO_NAME}}/{{DJANGO_PROJ_NAME}}.sock {{DJANGO_PROJ_NAME}}.wsgi:application
+          [Install]
+          WantedBy=multi-user.target
+          ```
+    2. enter insert mode by pressing `i`
+    3. right click and paste the updated text
+    4. `esc` `:wq` `enter`
+37. `cd ..` to get out of project folder
+38. `sudo systemctl daemon-reload`
+39. `sudo systemctl restart gunicorn`
+40. `sudo systemctl status gunicorn`
+    - should see a green dot and *'active (running)'* if it worked
+    - if you see failed or `Tasks: 1`, you will likely have to terminate instance and start over
+    - if you see any `{{}}` with an error, open the file in vim again and replace the `{{}}`
+    - **if you edit the `gunicorn.service` file after this point, you must run the above 3 commands again**
+41. press `ctrl + c`
+42. open this text in vscode:
+    - ``` txt
+      server {
+        listen 80;
+        server_name {{yourEC2.public.ip}};
+        location = /favicon.ico { access_log off; log_not_found off; }
+        location /static/ {
+            root /home/ubuntu/{{YOUR_REPO_NAME}};
+        }
+        location / {
+            include proxy_params;
+            proxy_pass http://unix:/home/ubuntu/{{YOUR_REPO_NAME}}/{{DJANGO_PROJ_NAME}}.sock;
+        }
+      }
+      ```
+    1. ***REPLACE THE {{}}*** with appropriate names
+    2. `sudo vim /etc/nginx/sites-available/{{DJANGO_PROJ_NAME}}`
+    3. `i` to enter insert mode then
+    4. right glick and paste
+    5. `esc` `:wq` `enter`
+43. `sudo ln -s /etc/nginx/sites-available/{{DJANGO_PROJ_NAME}} /etc/nginx/sites-enabled`
+44. `sudo nginx -t` to check if successful, if not, double check the vim file that was just created
+45. `sudo rm /etc/nginx/sites-enabled/default`
+46. `sudo service nginx restart`
+47. paste public ip address from AWS under description tab into browser
+- when you want to delete this AWS instance, right click it -> instance state -> terminate
 
 
 # Optional Design Patterns
