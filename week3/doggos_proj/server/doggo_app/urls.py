@@ -21,4 +21,9 @@ urlpatterns = [
          views.doggo_toggle_good_boy, name='doggo_toggle_good_boy'),
     path('doggos/<int:doggo_id>/delete',
          views.doggo_delete, name='doggo_delete'),
+
+    # tricks
+    path('tricks', views.tricks, name='tricks'),
+    path('tricks/<int:trick_id>', views.trick_info, name='trick_info'),
+
 ]

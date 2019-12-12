@@ -266,3 +266,26 @@ def doggo_update(request, doggo_id):
     # no dog found
     else:
         return redirect('/home')
+
+
+# tricks
+def tricks(request):
+    context = {
+        'all_tricks': Trick.objects.all(),
+    }
+
+    return render(request, 'tricks/all.html', context)
+
+
+def trick_info(request, trick_id):
+
+    found_tricks = Trick.objects.filter(id=trick_id)
+
+    if len(found_tricks) > 0:
+        context = {
+            'trick': found_tricks[0]
+        }
+
+        return render(request, 'tricks/trick_info.html', context)
+
+    return redirect('/home')

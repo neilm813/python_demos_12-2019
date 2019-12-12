@@ -41,7 +41,9 @@
       <ul>
         {% for trick in doggo.tricks.all %}
         <li>
-          {{ trick.name }}
+          <a href="/tricks/{{ trick.id }}">
+            {{ trick.name }}
+          </a>
         </li>
         {% endfor %}
       </ul>
