@@ -14,12 +14,12 @@
 
   <div class="container pt-5">
     <h3>
-      <a href="/home">Home</a>
+      <a href="/home">Home</a> | <a href="/logout">Logout</a>
     </h3>
     <div class="row">
 
       <div class="col-md">
-        <h1 class="mb-3">Good Boys</h1>
+        <h1 class="mb-3 text-center">Good Boys</h1>
 
         <table class="table table-striped">
           <thead>
@@ -39,7 +39,15 @@
               <td>{{ good_boy.weight }}</td>
               <td>{{ good_boy.birthday }}</td>
               <td>
-                Actions
+                <a href="/doggos/{{ good_boy.id }}/toggle_good_boy">Bad Boy!!</a>
+                <br>
+                <a href="/doggos/{{ good_boy.id }}">Profile</a>
+                <br>
+                <a href="/doggos/{{ good_boy.id }}/edit">Edit</a>
+                <br>
+                {% if good_boy.submitted_by.id == request.session.uid %}
+                <a href="/doggos/{{ good_boy.id }}/delete">Delete</a>
+                {% endif %}
               </td>
             </tr>
             {% endfor %}
@@ -49,7 +57,7 @@
       </div>
 
       <div class="col-md">
-        <h1 class="mb-3">Bad Boys</h1>
+        <h1 class="mb-3 text-center">Bad Boys</h1>
 
         <table class="table table-striped">
           <thead>
@@ -69,9 +77,15 @@
               <td>{{ bad_boy.weight }}</td>
               <td>{{ bad_boy.birthday }}</td>
               <td>
-                <a href="/doggos/{{ bad_boy.id }}/good_boy">
+                <a href="/doggos/{{ bad_boy.id }}/toggle_good_boy">
                   Who's a good boy!?
                 </a>
+                <br>
+                <a href="/doggos/{{ bad_boy.id }}">Profile</a>
+                <br>
+                {% if bad_boy.submitted_by.id == request.session.uid %}
+                <a href="/doggos/{{ bad_boy.id }}/delete">Delete</a>
+                {% endif %}
               </td>
             </tr>
             {% endfor %}

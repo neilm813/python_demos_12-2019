@@ -144,7 +144,7 @@ def doggos(request):
         return render(request, 'doggos/all.html', context)
 
 
-def good_boy(request, doggo_id):
+def toggle_good_boy(request, doggo_id):
 
     if request.session.get('uid') is None:
         return redirect('/')
@@ -155,7 +155,71 @@ def good_boy(request, doggo_id):
         # since doggos list is not empty, there should be 1 doggo
         # extract the single doggo from the list
         doggo = found_doggos[0]
-        doggo.is_good_boy = True
+        doggo.is_good_boy = not doggo.is_good_boy
         doggo.save()
 
     return redirect('/doggos')
+
+
+def doggo_delete(request, doggo_id):
+
+    uid = request.session.get('uid')
+
+    if uid is None:
+        return redirect('/')
+
+    logged_in_user = User.objects.get(id=uid)
+
+    found_doggos = Doggo.objects.filter(id=doggo_id)
+
+    if len(found_doggos) > 0:
+        doggo_to_delete = found_doggos[0]
+
+        if logged_in_user == doggo_to_delete.submitted_by:
+            doggo_to_delete.delete()
+
+    return redirect('/doggos')
+
+
+def doggo_edit(request, doggo_id):
+
+    if request.session.get('uid') is None:
+        return redirect('/')
+
+    found_doggos = Doggo.objects.filter(id=doggo_id)
+
+    if len(found_doggos) > 0:
+        doggo_to_edit = found_doggos[0]
+
+        context = {
+            'doggo_to_edit': doggo_to_edit,
+            'formatted_birthday': doggo_to_edit.birthday.strftime("%Y-%m-%d")
+        }
+
+        return render(request, 'doggos/edit.html', context)
+    else:
+        return redirect('/doggos/all')
+
+
+def doggo_update(request, doggo_id):
+
+    if request.session.get('uid') is None:
+        return redirect('/')
+
+    found_doggos = Doggo.objects.filter(id=doggo_id)
+
+    if len(found_doggos) > 0:
+        doggo_to_update = found_doggos[0]
+
+        doggo_to_update.name = request.POST['name']
+        doggo_to_update.profile_pic_url = request.POST['profile_pic_url']
+        doggo_to_update.bio = request.POST['bio']
+        doggo_to_update.age = request.POST['age']
+        doggo_to_update.weight = request.POST['weight']
+        doggo_to_update.tricks = request.POST['tricks']
+        doggo_to_update.birthday = request.POST['birthday']
+        doggo_to_update.save()
+        return redirect(f'/doggos/{doggo_id}')
+
+    else:
+        return redirect('/home')
