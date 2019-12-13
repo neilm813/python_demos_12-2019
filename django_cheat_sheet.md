@@ -131,6 +131,7 @@
 4. view function gets data from the database if needed and sends that data to the right template (HTML) to display the data, ***OR*** the view function redirects to another URL (see step 2)
 5. Whatever the view function returns is the *response* which finishes the *request* *response* cycle.
 
+
 # Model Examples
 - user can have many tasks, but a task can be added by only 1 user
 - many to many between user and tasks for liking: user can like many tasks, task can be liked by many users
@@ -229,40 +230,42 @@
 - ctrl + shift + p > Open Settings (JSON)
 - comment out `{"python.jediEnabled": false}` in `settings.json`
 
-# Deployment Steps
-- create an account then go to [AWS Management Console](https://us-west-1.console.aws.amazon.com/console/home?region=us-west-1)
-- [running instances link](https://us-west-1.console.aws.amazon.com/ec2/v2/home?region=us-west-1#Instances:sort=instanceId)
+# Deployment Steps For projects with `server` folder and `env` in proj
+- create an AWS account then go to [AWS Management Console](https://us-west-1.console.aws.amazon.com/console/home?region=us-west-1)
+- [AWS page for after you have an instance set up](https://us-west-1.console.aws.amazon.com/ec2/v2/home?region=us-west-1#Instances:sort=instanceId)
 
-## create a file named `.gitignore` at same level as `manage.py`
-- add this code to it
-  - ``` txt
-    .vscode
-    env/
-    venv/
-    __pycache__/
-    .vscode/
-    db.sqlite3
-    ```
+## Git Repo steps
+1. open project to `server` folder
+2. create a file named `.gitignore` at same level as `manage.py`
+    - add this code to it
+      - ``` txt
+        .vscode
+        env/
+        venv/
+        __pycache__/
+        .vscode/
+        db.sqlite3
+        ```
+3. from the `server` folder with `env` activated: `pip freeze > requirements.txt`
+4. Open terminal to `server` folder
+5. `git init`
+6. `git add .`
+7. `git commit -m "first commit"`
+8. [create a repo on github](https://github.com/new)
+    - after repo is created github will provide some steps:
+    1. paste the `git remote add` line to terminal
+    2. paste the `git push` line to terminal
+    3. refresh github and you should see your code on there
+        - make sure none of the folders/files in the `.gitignore` were added, if they were restart
 
-## `requirements.txt`
-- from the `server` folder with `env` activated: `pip freeze > requirements.txt`
-
-## Create github repo
-1. Open terminal to `server` folder
-2. `git init`
-3. `git add .`
-4. `git commit -m "first commit"`
-- create a repo on github
-  1. paste the `git remote add` line to terminal
-  2. paste the `git push` line to terminal
-
-## AWS EC2 Virtual Machine setup (*REPLACE {{}} WITH APPROPRIATE NAMES*)
-1. Click Launch a virtual machine With EC2
+## AWS EC2 Virtual Machine setup (***!!!!!!!REPLACE {{text}} WITH APPROPRIATE TEXT - DON'T KEEP CURLY BRACES!!!!!!!***)
+1. click Launch a virtual machine With EC2
 2. select Ubuntu Server 18.04 LTS (HVM)
+    - free tier eligible
 3. select free tier option
 4. click Review and Launch
 5. click Edit security groups
-6. Under Source on SSH: select My IP
+6. SSH: Under Source: select My IP
 7. click Add Rule
     - Type: HTTP
     - Source: Anywhere
@@ -278,9 +281,9 @@
       3. click Download Key Pair
           - save it to a folder you will **NEVER** use as a github repo
       4. click Launch Instances
-12. click View Instances
+12. click View Instances (will load for a few minutes)
 13. update Name column to: django
-14. open terminal to where your downloaded pem file is located (**windows users USE BASH instead of command prompt**)
+14. open terminal to where your downloaded pem file is located (***windows users USE BASH instead of command prompt***)
 15. click connect at top of the AWS console
 16. copy and paste the `chmod` line of code into your terminal that is opened to the location of your downloaded pem file
 17. copy and paste the `ssh` line of code into your terminal
@@ -289,35 +292,42 @@
       2. Inbound tab
       3. click edit
       4. add SSH with source My IP (any time your ip address changes you need to do this, your ip address will be different from home vs at the dojo)
-18. 'yes' to continue if prompted
+18. yes to continue if prompted
 19. `sudo apt-get update`
 20. `sudo apt-get install nginx`
+    - y to continue if prompted
 21. `git clone {{YOUR_REPO_URL}}` - click the Clone or download button on your repo to get the URL
 22. `sudo apt-get install python3-venv`
+    - y to continue if prompted
 23. `cd {{YOUR_REPO_NAME}}`
 24. `python3 -m venv env`
     - new line will appear in terminal after it's finished
+    - `ls` should now show an `env` folder
 25. `source env/bin/activate` - should see `(env)` now in terminal
 26. `pip install -r requirements.txt`
+    - some errors like 'Failed building wheel for autopep8' are ok
 27. `pip install gunicorn`
-- [VIM info](http://learn.codingdojo.com/m/119/6138/42637)
+28. [Get ready for vim - vim has no mercy](http://learn.codingdojo.com/m/119/6138/42637)
 29. `cd {{YOUR_PROJECT_FOLDER_NAME}}` so that `ls` will show `settings.py`
 28. `sudo vim settings.py`
-29. press `i` to enter insert mode and use arrow keys to naviate to the correct place to type
+29. press `i` to enter insert mode and use arrow keys / scroll to navigate to the correct place to type
     - update the following lines:
     1. `DEBUG = False`
-    2. `ALLOWED_HOSTS = ['{{YOUR_EC2_PUBLIC_IP_ADDRESS_FROM_AWS_DESCRIPTION_TAB}}']`
-    3. `STATIC_ROOT = os.path.join(BASE_DIR, "static/")	# add this line at the bottom; don't replace any existing lines!`
+    2. `ALLOWED_HOSTS = ['{{YOUR_IPv4_Public_IP_ADDRESS}}']`
+        - this ip address is in description tab in AWS
+        - don't delete the quotes
+    3. `STATIC_ROOT = os.path.join(BASE_DIR, "static/")`
+        - paste this line at the bottom of file (right click, paste when in insert mode)
     4. save and quit: press `esc`, type: `:wq`, press `enter`
 30. `cd ..` so `ls` shows `manage.py`
 31. `python manage.py collectstatic`
 32. `python manage.py makemigrations`
 33. `python manage.py migrate`
 34. test gunicorn to see if it works: `gunicorn {{DJANGO_PROJECT_NAME.wsgi}}`
-    - press `ctrl + c` to exit
-35. type `deactivate`
+    - press `ctrl + c` to stop it
+35. type `deactivate` to deactivate `env`
 36. `sudo vim /etc/systemd/system/gunicorn.service`
-    1. copy below text into vscode and ***REPLACE ALL THE {{}} TEXT WITH RIGHT NAMES***
+    1. copy below text into vscode and ***REPLACE ALL THE {{}} TEXT WITH RIGHT NAMES*** - remember you can use ctrl + D to select each occurrence
         - ``` txt
           [Unit]
           Description=gunicorn daemon
@@ -333,7 +343,7 @@
     2. enter insert mode by pressing `i`
     3. right click and paste the updated text
     4. `esc` `:wq` `enter`
-37. `cd ..` to get out of project folder
+37. `cd ..` to get out of repo folder
 38. `sudo systemctl daemon-reload`
 39. `sudo systemctl restart gunicorn`
 40. `sudo systemctl status gunicorn`
@@ -346,7 +356,7 @@
     - ``` txt
       server {
         listen 80;
-        server_name {{yourEC2.public.ip}};
+        server_name {{YOUR_EC2_IPv4_Public_IP_ADDRESS}};
         location = /favicon.ico { access_log off; log_not_found off; }
         location /static/ {
             root /home/ubuntu/{{YOUR_REPO_NAME}};
@@ -360,8 +370,9 @@
     1. ***REPLACE THE {{}}*** with appropriate names
     2. `sudo vim /etc/nginx/sites-available/{{DJANGO_PROJ_NAME}}`
     3. `i` to enter insert mode then
-    4. right glick and paste
-    5. `esc` `:wq` `enter`
+    4. copy the edited text from VSCode
+    5. right click vim to paste
+    6. `esc` `:wq` `enter`
 43. `sudo ln -s /etc/nginx/sites-available/{{DJANGO_PROJ_NAME}} /etc/nginx/sites-enabled`
 44. `sudo nginx -t` to check if successful, if not, double check the vim file that was just created
 45. `sudo rm /etc/nginx/sites-enabled/default`
