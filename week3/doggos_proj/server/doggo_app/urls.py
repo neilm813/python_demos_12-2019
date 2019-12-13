@@ -24,6 +24,6 @@ urlpatterns = [
 
     # tricks
     path('tricks', views.tricks, name='tricks'),
-    path('tricks/<int:trick_id>', views.trick_info, name='trick_info'),
+    path('tricks/<int:trick_id>', views.tricks_info, name='tricks_info'),
 
 ]

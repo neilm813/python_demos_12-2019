@@ -63,6 +63,9 @@ class DoggoManager(models.Manager):
         if len(request.POST['name']) < 2:
             messages.error(request, 'Name must be at least 2 characters.')
 
+        if len(request.POST['birthday']) < 1:
+            messages.error(request, 'Birthday is required.')
+
         error_messages = messages.get_messages(request)
         # don't clear messages due to them being accessed
         error_messages.used = False
@@ -81,8 +84,15 @@ class Doggo(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = DoggoManager()
     # Relationships
+
+    # submitted_by is the whole user object that submitted the dog
+    # dogs is added to User model and is a list of all the dogs they uploaded
     submitted_by = models.ForeignKey(
         'User', on_delete='CASCADE', related_name='dogs')
+
+    # tricks is a list of trick objects
+    # dogs_with_tricks is added to Trick class and is a list of dogs that can
+    # do that particular trick
     tricks = models.ManyToManyField('Trick', related_name='dogs_with_trick')
 
     def __str__(self):

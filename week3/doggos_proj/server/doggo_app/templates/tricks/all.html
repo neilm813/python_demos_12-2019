@@ -13,11 +13,15 @@
 <body>
 
   <div class="container">
+    <h1 class="text-center">
+      All Tricks
+    </h1>
+
     <ul>
       {% for trick in all_tricks %}
       <li>
         <a href="/tricks/{{ trick.id }}">
-          {{ trick.name }}
+          {{ trick.name }} ({{ trick.dogs_with_trick.all|length }})
         </a>
       </li>
       {% endfor %}

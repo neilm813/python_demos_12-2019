@@ -13,12 +13,16 @@
 <body>
 
   <div class="container">
-    <h1 class="text-center">Dogs with trick: {{ trick.name }}</h1>
+    <h1 class="text-center">
+      Dogs with trick: {{ trick.name }}
+    </h1>
 
     <ul>
       {% for doggo in trick.dogs_with_trick.all %}
       <li>
-        {{ doggo.name }}
+        <a href="/doggos/{{ doggo.id }}">
+          {{ doggo.name }} - submitted by: {{ doggo.submitted_by.full_name }}
+        </a>
       </li>
       {% endfor %}
     </ul>

@@ -117,30 +117,52 @@ def doggo_create(request):
         birthday=request.POST['birthday']
     )
 
-    # Value None and value empty string will not pass an if conditon
-    form_tricks = [
-        # None or the value of input if checked
-        request.POST.get('trick_roll_over'),
-        request.POST.get('trick_sit'),
-        request.POST.get('trick_shake'),
+    # easy solution: tricks that are checked and the 'other' trick could be
+    # concatenated as a string and added as a CharField,
+    # but many to many is better solution
 
-        # empty string or the value
-        request.POST.get('trick_other'),
-    ]
+    # FOR CHECKBOXES:
+    # if key does not exist, .get will return None
+    # instead of MultiValueDictKeyError, if it does exist
+    # it will return the name of the trick from the value of input box
+    roll_over_name = request.POST.get('trick_roll_over')
+    shake_name = request.POST.get('trick_shake')
+    sit_name = request.POST.get('trick_sit')
 
-    for trick in form_tricks:
-        # trick isn't None and isn't empty string
-        if trick:
-            found_tricks = Trick.objects.filter(name=trick)
+    # not a checkbox: empty string or what was typed in to the box
+    other_trick_name = request.POST['trick_other']
 
-            if len(found_tricks) > 0:
-                trick_from_db = found_tricks[0]
-                new_doggo.tricks.add(trick_from_db)
+    # if not None, the box was checked
+    if roll_over_name is not None:
 
-            # trick not in db, create it
-            else:
-                new_trick = Trick.objects.create(name=trick)
-                new_doggo.tricks.add(new_trick)
+        roll_over_from_db = Trick.objects.get(name=roll_over_name)
+        new_doggo.tricks.add(roll_over_from_db)
+
+    if shake_name is not None:
+
+        shake_from_db = Trick.objects.get(name=shake_name)
+        new_doggo.tricks.add(shake_from_db)
+
+    if sit_name is not None:
+
+        sit_from_db = Trick.objects.get(name=sit_name)
+        new_doggo.tricks.add(sit_from_db)
+
+    #  HANDLE OTHER TRICK
+    # if something was typed into other input box
+    if len(other_trick_name) > 0:
+
+        found_other_tricks = Trick.objects.filter(name=other_trick_name)
+
+        # other trick already exists in db
+        if len(found_other_tricks) > 0:
+            other_trick_from_db = found_other_tricks[0]
+            new_doggo.tricks.add(other_trick_from_db)
+
+        # other trick doesn't exist yet
+        else:
+            new_other_trick = Trick.objects.create(name=other_trick_name)
+            new_doggo.tricks.add(new_other_trick)
 
     return redirect(f'/doggos/{new_doggo.id}')
 
@@ -289,3 +311,26 @@ def trick_info(request, trick_id):
         return render(request, 'tricks/trick_info.html', context)
 
     return redirect('/home')
+
+
+def tricks_info(request, trick_id):
+
+    found_tricks = Trick.objects.filter(id=trick_id)
+
+    if len(found_tricks) > 0:
+
+        context = {
+            'trick': found_tricks[0]
+        }
+
+        return render(request, 'tricks/info.html', context)
+
+    return redirect('/tricks')
+
+
+def tricks(request):
+    context = {
+        'all_tricks': Trick.objects.all()
+    }
+
+    return render(request, 'tricks/all.html', context)
