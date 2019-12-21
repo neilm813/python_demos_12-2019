@@ -103,3 +103,11 @@ class Doggo(models.Model):
 
 class Trick(models.Model):
     name = models.CharField(max_length=60)
+
+
+class Widget(models.Model):
+    name = models.CharField(max_length=60)
+
+
+class Item(models.Model):
+    name = models.CharField(max_length=60)
